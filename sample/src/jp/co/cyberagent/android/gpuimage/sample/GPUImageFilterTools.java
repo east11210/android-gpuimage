@@ -24,6 +24,23 @@ import android.graphics.PointF;
 import android.opengl.Matrix;
 
 import jp.co.cyberagent.android.gpuimage.*;
+import jp.co.cyberagent.android.gpuimage.filter.IF1977Filter;
+import jp.co.cyberagent.android.gpuimage.filter.IFAmaroFilter;
+import jp.co.cyberagent.android.gpuimage.filter.IFBrannanFilter;
+import jp.co.cyberagent.android.gpuimage.filter.IFEarlybirdFilter;
+import jp.co.cyberagent.android.gpuimage.filter.IFHefeFilter;
+import jp.co.cyberagent.android.gpuimage.filter.IFHudsonFilter;
+import jp.co.cyberagent.android.gpuimage.filter.IFInkwellFilter;
+import jp.co.cyberagent.android.gpuimage.filter.IFLomoFilter;
+import jp.co.cyberagent.android.gpuimage.filter.IFLordKelvinFilter;
+import jp.co.cyberagent.android.gpuimage.filter.IFNashvilleFilter;
+import jp.co.cyberagent.android.gpuimage.filter.IFRiseFilter;
+import jp.co.cyberagent.android.gpuimage.filter.IFSierraFilter;
+import jp.co.cyberagent.android.gpuimage.filter.IFSutroFilter;
+import jp.co.cyberagent.android.gpuimage.filter.IFToasterFilter;
+import jp.co.cyberagent.android.gpuimage.filter.IFValenciaFilter;
+import jp.co.cyberagent.android.gpuimage.filter.IFWaldenFilter;
+import jp.co.cyberagent.android.gpuimage.filter.IFXprollFilter;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +49,28 @@ public class GPUImageFilterTools {
     public static void showDialog(final Context context,
             final OnGpuImageFilterChosenListener listener) {
         final FilterList filters = new FilterList();
+        filters.addFilter("Gaussian Blur", FilterType.GAUSSIAN_BLUR);
+        filters.addFilter("ZoomBlur", FilterType.ZOOM_BLUR);
+        filters.addFilter("Halftone", FilterType.HALFTONE);
+        filters.addFilter("Rise", FilterType.EXTRA_RISE);
+        filters.addFilter("Hudson", FilterType.EXTRA_HUDSON);
+        filters.addFilter("Xproll", FilterType.EXTRA_XPROLL);
+        filters.addFilter("Sierra", FilterType.EXTRA_SIERRA);
+        filters.addFilter("Lomo", FilterType.EXTRA_LOMO);
+        filters.addFilter("Earlybird", FilterType.EXTRA_EARLYBIRD);
+        filters.addFilter("Sutro", FilterType.EXTRA_SUTRO);
+        filters.addFilter("Toaster", FilterType.EXTRA_TOASTER);
+        filters.addFilter("Brannan", FilterType.EXTRA_BRANNAN);
+        filters.addFilter("Inkwell", FilterType.EXTRA_INKWELL);
+        filters.addFilter("Walden", FilterType.EXTRA_WALDEN);
+        filters.addFilter("Hefe", FilterType.EXTRA_HEFE);
+        filters.addFilter("Valencia", FilterType.EXTRA_VALENCIA);
+        filters.addFilter("Nashville", FilterType.EXTRA_NASHVILLE);
+        filters.addFilter("1977", FilterType.EXTRA_1977);
+        filters.addFilter("Kelvin", FilterType.EXTRA_KELVIN);
+        filters.addFilter("Amaro", FilterType.EXTRA_AMARO);
+
+
         filters.addFilter("Contrast", FilterType.CONTRAST);
         filters.addFilter("Invert", FilterType.INVERT);
         filters.addFilter("Pixelation", FilterType.PIXELATION);
@@ -82,7 +121,7 @@ public class GPUImageFilterTools {
         filters.addFilter("Blend (Normal)", FilterType.BLEND_NORMAL);
 
         filters.addFilter("Lookup (Amatorka)", FilterType.LOOKUP_AMATORKA);
-        filters.addFilter("Gaussian Blur", FilterType.GAUSSIAN_BLUR);
+        filters.addFilter("Gaussian Blur Position", FilterType.GAUSSIAN_BLUR_POSITION);
         filters.addFilter("Crosshatch", FilterType.CROSSHATCH);
 
         filters.addFilter("Box Blur", FilterType.BOX_BLUR);
@@ -93,7 +132,6 @@ public class GPUImageFilterTools {
         filters.addFilter("Sketch", FilterType.SKETCH);
         filters.addFilter("Toon", FilterType.TOON);
         filters.addFilter("Smooth Toon", FilterType.SMOOTH_TOON);
-        filters.addFilter("Halftone", FilterType.HALFTONE);
 
         filters.addFilter("Bulge Distortion", FilterType.BULGE_DISTORTION);
         filters.addFilter("Glass Sphere", FilterType.GLASS_SPHERE);
@@ -129,6 +167,44 @@ public class GPUImageFilterTools {
 
     private static GPUImageFilter createFilterForType(final Context context, final FilterType type) {
         switch (type) {
+            case ZOOM_BLUR:
+                return new GPUImageZoomBlurFilter();
+            case EXTRA_RISE:
+                return new IFRiseFilter(context);
+            case EXTRA_HUDSON:
+                return new IFHudsonFilter(context);
+            case EXTRA_XPROLL:
+                return new IFXprollFilter(context);
+            case EXTRA_SIERRA:
+                return new IFSierraFilter(context);
+            case EXTRA_LOMO:
+                return new IFLomoFilter(context);
+            case EXTRA_EARLYBIRD:
+                return new IFEarlybirdFilter(context);
+            case EXTRA_SUTRO:
+                return new IFSutroFilter(context);
+            case EXTRA_TOASTER:
+                return new IFToasterFilter(context);
+            case EXTRA_BRANNAN:
+                return new IFBrannanFilter(context);
+            case EXTRA_INKWELL:
+                return new IFInkwellFilter(context);
+            case EXTRA_WALDEN:
+                return new IFWaldenFilter(context);
+            case EXTRA_HEFE:
+                return new IFHefeFilter(context);
+            case EXTRA_VALENCIA:
+                return new IFValenciaFilter(context);
+            case EXTRA_NASHVILLE:
+                return new IFNashvilleFilter(context);
+            case EXTRA_1977:
+                return new IF1977Filter(context);
+            case EXTRA_KELVIN:
+                return new IFLordKelvinFilter(context);
+            case EXTRA_AMARO:
+                return new IFAmaroFilter(context);
+
+
             case CONTRAST:
                 return new GPUImageContrastFilter(2.0f);
             case GAMMA:
@@ -164,7 +240,7 @@ public class GPUImageFilterTools {
             case POSTERIZE:
                 return new GPUImagePosterizeFilter();
             case FILTER_GROUP:
-                List<GPUImageFilter> filters = new LinkedList<GPUImageFilter>();
+                List<GPUImageFilter> filters = new LinkedList<>();
                 filters.add(new GPUImageContrastFilter());
                 filters.add(new GPUImageDirectionalSobelEdgeDetectionFilter());
                 filters.add(new GPUImageGrayscaleFilter());
@@ -250,6 +326,8 @@ public class GPUImageFilterTools {
                 return amatorka;
             case GAUSSIAN_BLUR:
                 return new GPUImageGaussianBlurFilter();
+            case GAUSSIAN_BLUR_POSITION:
+                return new GPUImageGaussianBlurPositionFilter();
             case CROSSHATCH:
                 return new GPUImageCrosshatchFilter();
 
@@ -325,17 +403,21 @@ public class GPUImageFilterTools {
     }
 
     private enum FilterType {
+        ZOOM_BLUR, HALFTONE,
+
+        EXTRA_RISE, EXTRA_HUDSON, EXTRA_XPROLL, EXTRA_SIERRA, EXTRA_LOMO, EXTRA_EARLYBIRD, EXTRA_SUTRO, EXTRA_TOASTER, EXTRA_BRANNAN, EXTRA_INKWELL, EXTRA_WALDEN, EXTRA_HEFE, EXTRA_VALENCIA, EXTRA_NASHVILLE, EXTRA_1977, EXTRA_KELVIN, EXTRA_AMARO,
+
         CONTRAST, GRAYSCALE, SHARPEN, SEPIA, SOBEL_EDGE_DETECTION, THREE_X_THREE_CONVOLUTION, FILTER_GROUP, EMBOSS, POSTERIZE, GAMMA, BRIGHTNESS, INVERT, HUE, PIXELATION,
         SATURATION, EXPOSURE, HIGHLIGHT_SHADOW, MONOCHROME, OPACITY, RGB, WHITE_BALANCE, VIGNETTE, TONE_CURVE, BLEND_COLOR_BURN, BLEND_COLOR_DODGE, BLEND_DARKEN, BLEND_DIFFERENCE,
         BLEND_DISSOLVE, BLEND_EXCLUSION, BLEND_SOURCE_OVER, BLEND_HARD_LIGHT, BLEND_LIGHTEN, BLEND_ADD, BLEND_DIVIDE, BLEND_MULTIPLY, BLEND_OVERLAY, BLEND_SCREEN, BLEND_ALPHA,
         BLEND_COLOR, BLEND_HUE, BLEND_SATURATION, BLEND_LUMINOSITY, BLEND_LINEAR_BURN, BLEND_SOFT_LIGHT, BLEND_SUBTRACT, BLEND_CHROMA_KEY, BLEND_NORMAL, LOOKUP_AMATORKA,
-        GAUSSIAN_BLUR, CROSSHATCH, BOX_BLUR, CGA_COLORSPACE, DILATION, KUWAHARA, RGB_DILATION, SKETCH, TOON, SMOOTH_TOON, BULGE_DISTORTION, GLASS_SPHERE, HAZE, LAPLACIAN, NON_MAXIMUM_SUPPRESSION,
-        SPHERE_REFRACTION, SWIRL, WEAK_PIXEL_INCLUSION, FALSE_COLOR, COLOR_BALANCE, LEVELS_FILTER_MIN, BILATERAL_BLUR, HALFTONE, TRANSFORM2D
+        GAUSSIAN_BLUR, GAUSSIAN_BLUR_POSITION, CROSSHATCH, BOX_BLUR, CGA_COLORSPACE, DILATION, KUWAHARA, RGB_DILATION, SKETCH, TOON, SMOOTH_TOON, BULGE_DISTORTION, GLASS_SPHERE, HAZE, LAPLACIAN, NON_MAXIMUM_SUPPRESSION,
+        SPHERE_REFRACTION, SWIRL, WEAK_PIXEL_INCLUSION, FALSE_COLOR, COLOR_BALANCE, LEVELS_FILTER_MIN, BILATERAL_BLUR, TRANSFORM2D,
     }
 
     private static class FilterList {
-        public List<String> names = new LinkedList<String>();
-        public List<FilterType> filters = new LinkedList<FilterType>();
+        public List<String> names = new LinkedList<>();
+        public List<FilterType> filters = new LinkedList<>();
 
         public void addFilter(final String name, final FilterType filter) {
             names.add(name);
@@ -347,7 +429,9 @@ public class GPUImageFilterTools {
         private final Adjuster<? extends GPUImageFilter> adjuster;
 
         public FilterAdjuster(final GPUImageFilter filter) {
-            if (filter instanceof GPUImageSharpenFilter) {
+            if (filter instanceof GPUImageZoomBlurFilter) {
+                adjuster = new ZoomBlurAdjuster().filter(filter);
+            } else if (filter instanceof GPUImageSharpenFilter) {
                 adjuster = new SharpnessAdjuster().filter(filter);
             } else if (filter instanceof GPUImageSepiaFilter) {
                 adjuster = new SepiaAdjuster().filter(filter);
@@ -389,6 +473,8 @@ public class GPUImageFilterTools {
                 adjuster = new DissolveBlendAdjuster().filter(filter);
             } else if (filter instanceof GPUImageGaussianBlurFilter) {
                 adjuster = new GaussianBlurAdjuster().filter(filter);
+            } else if (filter instanceof GPUImageGaussianBlurPositionFilter) {
+                adjuster = new GaussianBlurPositionAdjuster().filter(filter);
             } else if (filter instanceof GPUImageCrosshatchFilter) {
                 adjuster = new CrosshatchBlurAdjuster().filter(filter);
             } else if (filter instanceof GPUImageBulgeDistortionFilter) {
@@ -411,7 +497,6 @@ public class GPUImageFilterTools {
                 adjuster = new RotateAdjuster().filter(filter);
             }
             else {
-
                 adjuster = null;
             }
         }
@@ -447,6 +532,13 @@ public class GPUImageFilterTools {
 
             protected int range(final int percentage, final int start, final int end) {
                 return (end - start) * percentage / 100 + start;
+            }
+        }
+
+        private class ZoomBlurAdjuster extends Adjuster<GPUImageZoomBlurFilter> {
+            @Override
+            public void adjust(final int size) {
+                getFilter().setSize(range(size, 1.0f, 20.0f));
             }
         }
 
@@ -599,7 +691,16 @@ public class GPUImageFilterTools {
         private class GaussianBlurAdjuster extends Adjuster<GPUImageGaussianBlurFilter> {
             @Override
             public void adjust(final int percentage) {
-                getFilter().setBlurSize(range(percentage, 0.0f, 1.0f));
+//                getFilter().setBlurSize(range(percentage, 0.0f, 1.0f));
+//                getFilter().setRadius(range(percentage, 0.0f, 1.0f));
+                getFilter().setRadiusInPixel(range(percentage, 1, 8));
+            }
+        }
+
+        private class GaussianBlurPositionAdjuster extends Adjuster<GPUImageGaussianBlurPositionFilter> {
+            @Override
+            public void adjust(final int percentage) {
+                getFilter().setRadius(range(percentage, 0.0f, 1.0f));
             }
         }
 

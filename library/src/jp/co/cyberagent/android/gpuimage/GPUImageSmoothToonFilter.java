@@ -16,14 +16,12 @@
 
 package jp.co.cyberagent.android.gpuimage;
 
-import android.opengl.GLES20;
-
 /**
  *  This uses a similar process as the GPUImageToonFilter, only it precedes the toon effect
  *  with a Gaussian blur to smooth out noise.
  */
 public class GPUImageSmoothToonFilter extends GPUImageFilterGroup {
-    GPUImageGaussianBlurFilter blurFilter;
+    GPUImageGaussianBlurPositionFilter blurFilter;
     GPUImageToonFilter toonFilter;
 
     /**
@@ -31,7 +29,7 @@ public class GPUImageSmoothToonFilter extends GPUImageFilterGroup {
      */
     public GPUImageSmoothToonFilter() {
         // First pass: apply a variable Gaussian blur
-        blurFilter = new GPUImageGaussianBlurFilter();
+        blurFilter = new GPUImageGaussianBlurPositionFilter();
         addFilter(blurFilter);
 
         // Second pass: run the Sobel edge detection on this blurred image, along with a posterization effect

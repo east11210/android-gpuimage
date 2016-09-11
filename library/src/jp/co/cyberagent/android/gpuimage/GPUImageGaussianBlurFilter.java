@@ -16,78 +16,119 @@
 
 package jp.co.cyberagent.android.gpuimage;
 
-/**
- * A more generalized 9x9 Gaussian blur filter
- * blurSize value ranging from 0.0 on up, with a default of 1.0
- */
-public class GPUImageGaussianBlurFilter extends GPUImageTwoPassTextureSamplingFilter {
-    public static final String VERTEX_SHADER =
-            "attribute vec4 position;\n" +
-                    "attribute vec4 inputTextureCoordinate;\n" +
-                    "\n" +
-                    "const int GAUSSIAN_SAMPLES = 9;\n" +
-                    "\n" +
-                    "uniform float texelWidthOffset;\n" +
-                    "uniform float texelHeightOffset;\n" +
-                    "\n" +
-                    "varying vec2 textureCoordinate;\n" +
-                    "varying vec2 blurCoordinates[GAUSSIAN_SAMPLES];\n" +
-                    "\n" +
-                    "void main()\n" +
-                    "{\n" +
-                    "	gl_Position = position;\n" +
-                    "	textureCoordinate = inputTextureCoordinate.xy;\n" +
-                    "	\n" +
-                    "	// Calculate the positions for the blur\n" +
-                    "	int multiplier = 0;\n" +
-                    "	vec2 blurStep;\n" +
-                    "   vec2 singleStepOffset = vec2(texelHeightOffset, texelWidthOffset);\n" +
-                    "    \n" +
-                    "	for (int i = 0; i < GAUSSIAN_SAMPLES; i++)\n" +
-                    "   {\n" +
-                    "		multiplier = (i - ((GAUSSIAN_SAMPLES - 1) / 2));\n" +
-                    "       // Blur in x (horizontal)\n" +
-                    "       blurStep = float(multiplier) * singleStepOffset;\n" +
-                    "		blurCoordinates[i] = inputTextureCoordinate.xy + blurStep;\n" +
-                    "	}\n" +
-                    "}\n";
+import android.graphics.PointF;
+import android.opengl.GLES20;
 
-    public static final String FRAGMENT_SHADER =
-            "uniform sampler2D inputImageTexture;\n" +
-                    "\n" +
-                    "const lowp int GAUSSIAN_SAMPLES = 9;\n" +
-                    "\n" +
-                    "varying highp vec2 textureCoordinate;\n" +
-                    "varying highp vec2 blurCoordinates[GAUSSIAN_SAMPLES];\n" +
-                    "\n" +
-                    "void main()\n" +
-                    "{\n" +
-                    "	lowp vec3 sum = vec3(0.0);\n" +
-                    "   lowp vec4 fragColor=texture2D(inputImageTexture,textureCoordinate);\n" +
-                    "	\n" +
-                    "    sum += texture2D(inputImageTexture, blurCoordinates[0]).rgb * 0.05;\n" +
-                    "    sum += texture2D(inputImageTexture, blurCoordinates[1]).rgb * 0.09;\n" +
-                    "    sum += texture2D(inputImageTexture, blurCoordinates[2]).rgb * 0.12;\n" +
-                    "    sum += texture2D(inputImageTexture, blurCoordinates[3]).rgb * 0.15;\n" +
-                    "    sum += texture2D(inputImageTexture, blurCoordinates[4]).rgb * 0.18;\n" +
-                    "    sum += texture2D(inputImageTexture, blurCoordinates[5]).rgb * 0.15;\n" +
-                    "    sum += texture2D(inputImageTexture, blurCoordinates[6]).rgb * 0.12;\n" +
-                    "    sum += texture2D(inputImageTexture, blurCoordinates[7]).rgb * 0.09;\n" +
-                    "    sum += texture2D(inputImageTexture, blurCoordinates[8]).rgb * 0.05;\n" +
-                    "\n" +
-                    "	gl_FragColor = vec4(sum,fragColor.a);\n" +
-                    "}";
+public class GPUImageGaussianBlurFilter extends GPUImageTwoPassTextureSamplingFilter {
+
+    private static String vertexShaderForStandardBlurOfRadius(final int radius, final float sigma) {
+        if (1 > radius) {
+            return NO_FILTER_VERTEX_SHADER;
+        }
+        int samples = radius * 2 + 1;
+        String shaderString =
+                "attribute vec4 position;\n" +
+                "attribute vec4 inputTextureCoordinate;\n" +
+                "\n" +
+                "const int SAMPLES = " + samples + ";\n" +
+                "uniform float texelWidthOffset;\n" +
+                "uniform float texelHeightOffset;\n" +
+                "\n" +
+                "varying vec2 blurCoordinates[SAMPLES];\n" +
+                "\n" +
+                "void main()\n" +
+                "{\n" +
+                "    gl_Position = position;\n" +
+                "    \n" +
+                "    vec2 singleStepOffset = vec2(texelWidthOffset, texelHeightOffset);\n";
+        for (int i = 0; i < samples; ++i) {
+            int offsetFromCenter = i - radius;
+            shaderString += "    blurCoordinates[" + i + "] = inputTextureCoordinate.xy";
+            if (0 > offsetFromCenter) {
+                shaderString += " - singleStepOffset * " + (float) -offsetFromCenter;
+            } else if (0 < offsetFromCenter) {
+                shaderString += " + singleStepOffset * " + (float) offsetFromCenter;
+            }
+            shaderString += ";\n";
+        }
+        shaderString += "}\n";
+        return shaderString;
+    }
+
+    private static String fragmentShaderForStandardBlurOfRadius(final int radius, final float sigma) {
+        if (1 > radius) {
+            return NO_FILTER_FRAGMENT_SHADER;
+        }
+        // First, generate the normal Gaussian weights for a given sigma
+        int i;
+        final int weights = radius + 1;
+        final int samples = radius * 2+ 1;
+        float sumOfWeights = 0.0f;
+        float standardGaussianWeights[] = new float[weights];
+        for (i = 0; i < weights; ++i) {
+            standardGaussianWeights[i] = (float) ((1.0 / Math.sqrt(2.0 * Math.PI * Math.pow(sigma, 2.0))) * Math.exp(-Math.pow(i, 2.0) / (2.0 * Math.pow(sigma, 2.0))));
+            if (0 == i) {
+                sumOfWeights += standardGaussianWeights[i];
+            } else {
+                sumOfWeights += 2.0 * standardGaussianWeights[i];
+            }
+        }
+        for (i = 0; i < weights; ++i) {
+            standardGaussianWeights[i] = standardGaussianWeights[i] / sumOfWeights;
+        }
+        String shaderString =
+                "uniform sampler2D inputImageTexture;\n" +
+                "varying highp vec2 blurCoordinates[" + samples + "];\n" +
+                "void main() {\n" +
+                "    lowp vec4 sum = vec4(0.0);\n";
+        for (i = 0; i < samples; ++i) {
+            int offsetFromCenter = i - radius;
+            shaderString += "    sum += texture2D(inputImageTexture, blurCoordinates[" + i + "]) * ";
+            if (0 > offsetFromCenter) {
+                shaderString += standardGaussianWeights[-offsetFromCenter];
+            } else {
+                shaderString += standardGaussianWeights[ offsetFromCenter];
+            }
+            shaderString += ";\n";
+        }
+        shaderString +=
+                "    gl_FragColor = sum;\n" +
+                "}\n";
+        return shaderString;
+    }
 
     protected float mBlurSize = 1f;
+    protected int mRadiusInPixel = 2;
 
     public GPUImageGaussianBlurFilter() {
-        this(1f);
+        this(1.0f, 2);
     }
 
-    public GPUImageGaussianBlurFilter(float blurSize) {
-        super(VERTEX_SHADER, FRAGMENT_SHADER, VERTEX_SHADER, FRAGMENT_SHADER);
+    public GPUImageGaussianBlurFilter(float blurSize, int radiusInPixel) {
+        super(vertexShaderForStandardBlurOfRadius(4, 2.0f),
+            fragmentShaderForStandardBlurOfRadius(4, 2.0f),
+            vertexShaderForStandardBlurOfRadius(4, 2.0f),
+            fragmentShaderForStandardBlurOfRadius(4, 2.0f));
         mBlurSize = blurSize;
+        mRadiusInPixel = radiusInPixel;
     }
+
+//    @Override
+//    public void onInit() {
+//        super.onInit();
+//        GPUImageFilter filter = mFilters.get(1);
+//        mAspectRatioLocation = GLES20.glGetUniformLocation(filter.getProgram(), "aspectRatio");
+//        mCenterLocation = GLES20.glGetUniformLocation(filter.getProgram(), "blurCenter");
+//        mRadiusLocation = GLES20.glGetUniformLocation(filter.getProgram(), "blurRadius");
+//    }
+//
+//    @Override
+//    public void onInitialized() {
+//        super.onInitialized();
+//        setCenter(mCenter);
+//        setRadius(mRadius);
+//        setAspectRatio(1.0f);
+//    }
 
     @Override
     public float getVerticalTexelOffsetRatio() {
@@ -110,6 +151,57 @@ public class GPUImageGaussianBlurFilter extends GPUImageTwoPassTextureSamplingFi
             @Override
             public void run() {
                 initTexelOffsets();
+            }
+        });
+    }
+
+//    public void setAspectRatio(final float aspectRatio) {
+//        mAspectRatio = aspectRatio;
+//        setFloat(mAspectRatioLocation, mAspectRatio);
+//    }
+//
+//    public void setCenter(final PointF center) {
+//        mCenter = center;
+//        setPoint(mCenterLocation, mCenter);
+//    }
+//
+//    public void setRadius(final float radius) {
+//        mRadius = radius;
+//        setFloat(mRadiusLocation, mRadius);
+//    }
+
+    public void setRadiusInPixel(final int radiusInPixel) {
+        if (mRadiusInPixel == radiusInPixel
+                || 1 > radiusInPixel) {
+            return;
+        }
+        mRadiusInPixel = radiusInPixel;
+
+        runOnDraw(new Runnable() {
+            @Override
+            public void run() {
+//                destroy();
+                for (GPUImageFilter filter : mFilters) {
+                    filter.destroy();
+                }
+                mFilters.clear();
+                final float minimumWeightToFindEdgeOfSamplingArea = 1.0f/256.0f;
+                int sampleRadius = (int) Math.floor(Math.sqrt(
+                        -2.0 * Math.pow(mRadiusInPixel, 2.0)
+                                * Math.log(minimumWeightToFindEdgeOfSamplingArea * Math.sqrt(2.0 * Math.PI * Math.pow(mRadiusInPixel, 2.0)))
+                ));
+                String vertexShader = vertexShaderForStandardBlurOfRadius(sampleRadius, radiusInPixel);
+                String fragmentShader = fragmentShaderForStandardBlurOfRadius(sampleRadius, radiusInPixel);
+                addFilter(new GPUImageFilter(vertexShader, fragmentShader));
+                addFilter(new GPUImageFilter(vertexShader, fragmentShader));
+                for (GPUImageFilter filter : mFilters) {
+                    filter.init();
+                }
+                updateMergedFilters();
+                initTexelOffsets();
+//                init();
+//                GLES20.glUseProgram(getProgram());
+
             }
         });
     }

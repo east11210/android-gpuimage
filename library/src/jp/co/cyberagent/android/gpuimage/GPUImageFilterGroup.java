@@ -40,9 +40,9 @@ public class GPUImageFilterGroup extends GPUImageFilter {
     private int[] mFrameBuffers;
     private int[] mFrameBufferTextures;
 
-    private final FloatBuffer mGLCubeBuffer;
-    private final FloatBuffer mGLTextureBuffer;
-    private final FloatBuffer mGLTextureFlipBuffer;
+    private FloatBuffer mGLCubeBuffer;
+    private FloatBuffer mGLTextureBuffer;
+    private FloatBuffer mGLTextureFlipBuffer;
 
     /**
      * Instantiates a new GPUImageFilterGroup with no filters.
@@ -59,26 +59,10 @@ public class GPUImageFilterGroup extends GPUImageFilter {
     public GPUImageFilterGroup(List<GPUImageFilter> filters) {
         mFilters = filters;
         if (mFilters == null) {
-            mFilters = new ArrayList<GPUImageFilter>();
+            mFilters = new ArrayList<>();
         } else {
             updateMergedFilters();
         }
-
-        mGLCubeBuffer = ByteBuffer.allocateDirect(CUBE.length * 4)
-                .order(ByteOrder.nativeOrder())
-                .asFloatBuffer();
-        mGLCubeBuffer.put(CUBE).position(0);
-
-        mGLTextureBuffer = ByteBuffer.allocateDirect(TEXTURE_NO_ROTATION.length * 4)
-                .order(ByteOrder.nativeOrder())
-                .asFloatBuffer();
-        mGLTextureBuffer.put(TEXTURE_NO_ROTATION).position(0);
-
-        float[] flipTexture = TextureRotationUtil.getRotation(Rotation.NORMAL, false, true);
-        mGLTextureFlipBuffer = ByteBuffer.allocateDirect(flipTexture.length * 4)
-                .order(ByteOrder.nativeOrder())
-                .asFloatBuffer();
-        mGLTextureFlipBuffer.put(flipTexture).position(0);
     }
 
     public void addFilter(GPUImageFilter aFilter) {
@@ -96,6 +80,23 @@ public class GPUImageFilterGroup extends GPUImageFilter {
     @Override
     public void onInit() {
         super.onInit();
+
+        mGLCubeBuffer = ByteBuffer.allocateDirect(CUBE.length * 4)
+                .order(ByteOrder.nativeOrder())
+                .asFloatBuffer();
+        mGLCubeBuffer.put(CUBE).position(0);
+
+        mGLTextureBuffer = ByteBuffer.allocateDirect(TEXTURE_NO_ROTATION.length * 4)
+                .order(ByteOrder.nativeOrder())
+                .asFloatBuffer();
+        mGLTextureBuffer.put(TEXTURE_NO_ROTATION).position(0);
+
+        float[] flipTexture = TextureRotationUtil.getRotation(Rotation.NORMAL, false, true);
+        mGLTextureFlipBuffer = ByteBuffer.allocateDirect(flipTexture.length * 4)
+                .order(ByteOrder.nativeOrder())
+                .asFloatBuffer();
+        mGLTextureFlipBuffer.put(flipTexture).position(0);
+
         for (GPUImageFilter filter : mFilters) {
             filter.init();
         }
@@ -232,7 +233,7 @@ public class GPUImageFilterGroup extends GPUImageFilter {
         }
 
         if (mMergedFilters == null) {
-            mMergedFilters = new ArrayList<GPUImageFilter>();
+            mMergedFilters = new ArrayList<>();
         } else {
             mMergedFilters.clear();
         }
