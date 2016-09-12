@@ -97,9 +97,7 @@ public class GPUImageFilterGroup extends GPUImageFilter {
                 .asFloatBuffer();
         mGLTextureFlipBuffer.put(flipTexture).position(0);
 
-        for (GPUImageFilter filter : mFilters) {
-            filter.init();
-        }
+        initFilters();
     }
 
     /*
@@ -109,10 +107,21 @@ public class GPUImageFilterGroup extends GPUImageFilter {
     @Override
     public void onDestroy() {
         destroyFramebuffers();
+        destroyFilters();
+        super.onDestroy();
+    }
+
+    protected void initFilters() {
+        for (GPUImageFilter filter : mFilters) {
+            filter.init();
+        }
+    }
+
+    protected void destroyFilters() {
         for (GPUImageFilter filter : mFilters) {
             filter.destroy();
         }
-        super.onDestroy();
+        mFilters.clear();
     }
 
     private void destroyFramebuffers() {

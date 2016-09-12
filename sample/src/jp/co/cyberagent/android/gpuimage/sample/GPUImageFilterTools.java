@@ -693,7 +693,7 @@ public class GPUImageFilterTools {
             public void adjust(final int percentage) {
 //                getFilter().setBlurSize(range(percentage, 0.0f, 1.0f));
 //                getFilter().setRadius(range(percentage, 0.0f, 1.0f));
-                getFilter().setRadiusInPixel(range(percentage, 1, 8));
+                getFilter().setRadiusInPixel(range(percentage, 1, 20));
             }
         }
 
