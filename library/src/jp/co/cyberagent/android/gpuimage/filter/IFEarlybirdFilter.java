@@ -122,10 +122,10 @@ public class IFEarlybirdFilter extends IFImageFilter {
     }
 
     private void setRes() {
-        addInputTexture(R.drawable.texture_earlybird_curves);
-        addInputTexture(R.drawable.texture_earlybird_overlay_map);
-        addInputTexture(R.drawable.texture_vignette_map);
-        addInputTexture(R.drawable.texture_earlybird_blowout);
-        addInputTexture(R.drawable.texture_earlybird_map);
+        addInputTexture(R.drawable.earlybird_curves);
+        addInputTexture(R.drawable.earlybird_overlay_map);
+        addInputTexture(R.drawable.vignette_map);
+        addInputTexture(R.drawable.earlybird_blowout);
+        addInputTexture(R.drawable.earlybird_map);
     }
 }

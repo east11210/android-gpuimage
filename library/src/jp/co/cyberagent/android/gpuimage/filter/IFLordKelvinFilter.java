@@ -40,6 +40,6 @@ public class IFLordKelvinFilter extends IFImageFilter {
     }
 
     private void setRes() {
-        addInputTexture(R.drawable.texture_kelvin_map);
+        addInputTexture(R.drawable.kelvin_map);
     }
 }

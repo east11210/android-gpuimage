@@ -58,3 +58,5 @@ public class GPUImageHardLightBlendFilter extends GPUImageTwoInputFilter {
         super(HARD_LIGHT_BLEND_FRAGMENT_SHADER);
     }
 }
+
+// TODO: Add parameter to swap texture1 and texture2

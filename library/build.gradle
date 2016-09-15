@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.novoda.bintray-release'
+//apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion COMPILE_SDK_VERSION as int
@@ -62,11 +62,11 @@ artifacts {
     archives androidJavadocsJar
 }
 
-publish {
-    userOrg = POM_DEVELOPER_ID
-    groupId = GROUP
-    artifactId = ARTIFACT_ID
-    publishVersion = VERSION_NAME
-    desc = POM_DESCRIPTION
-    website = POM_URL
-}
+//publish {
+//    userOrg = POM_DEVELOPER_ID
+//    groupId = GROUP
+//    artifactId = ARTIFACT_ID
+//    publishVersion = VERSION_NAME
+//    desc = POM_DESCRIPTION
+//    website = POM_URL
+//}

@@ -35,3 +35,5 @@ public class GPUImageColorBurnBlendFilter extends GPUImageTwoInputFilter {
         super(COLOR_BURN_BLEND_FRAGMENT_SHADER);
     }
 }
+
+// TODO: Add parameter to swap texture1 and texture2

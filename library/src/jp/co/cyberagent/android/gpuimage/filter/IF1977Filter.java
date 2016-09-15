@@ -35,7 +35,7 @@ public class IF1977Filter extends IFImageFilter {
     }
 
     private void setRes() {
-        addInputTexture(R.drawable.texture_nmap);
-        addInputTexture(R.drawable.texture_nblowout);
+        addInputTexture(R.drawable.nmap);
+        addInputTexture(R.drawable.nblowout);
     }
 }

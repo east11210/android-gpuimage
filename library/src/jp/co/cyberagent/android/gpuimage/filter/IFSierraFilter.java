@@ -42,8 +42,8 @@ public class IFSierraFilter extends IFImageFilter {
     }
 
     private void setRes() {
-        addInputTexture(R.drawable.texture_sierra_vignette);
-        addInputTexture(R.drawable.texture_overlay_map);
-        addInputTexture(R.drawable.texture_sierra_map);
+        addInputTexture(R.drawable.sierra_vignette);
+        addInputTexture(R.drawable.overlay_map);
+        addInputTexture(R.drawable.sierra_map);
     }
 }

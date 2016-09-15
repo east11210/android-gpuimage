@@ -55,7 +55,7 @@ public class IFValenciaFilter extends IFImageFilter {
     }
 
     private void setRes() {
-        addInputTexture(R.drawable.texture_valencia_map);
-        addInputTexture(R.drawable.texture_valencia_gradient_map);
+        addInputTexture(R.drawable.valencia_map);
+        addInputTexture(R.drawable.valencia_gradient_map);
     }
 }

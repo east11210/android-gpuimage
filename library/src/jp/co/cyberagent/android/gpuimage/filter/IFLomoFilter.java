@@ -48,7 +48,7 @@ public class IFLomoFilter extends IFImageFilter {
     }
 
     private void setRes() {
-        addInputTexture(R.drawable.texture_lomo_map);
-        addInputTexture(R.drawable.texture_vignette_map);
+        addInputTexture(R.drawable.lomo_map);
+        addInputTexture(R.drawable.vignette_map);
     }
 }

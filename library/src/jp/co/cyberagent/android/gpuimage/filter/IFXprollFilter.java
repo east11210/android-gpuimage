@@ -47,7 +47,7 @@ public class IFXprollFilter extends IFImageFilter {
     }
 
     private void setRes() {
-        addInputTexture(R.drawable.texture_xpro_map);
-        addInputTexture(R.drawable.texture_vignette_map);
+        addInputTexture(R.drawable.xpro_map);
+        addInputTexture(R.drawable.vignette_map);
     }
 }

@@ -90,10 +90,10 @@ public class IFBrannanFilter extends IFImageFilter {
     }
 
     private void setRes() {
-        addInputTexture(R.drawable.texture_brannan_process);
-        addInputTexture(R.drawable.texture_brannan_blowout);
-        addInputTexture(R.drawable.texture_brannan_contrast);
-        addInputTexture(R.drawable.texture_brannan_luma);
-        addInputTexture(R.drawable.texture_brannan_screen);
+        addInputTexture(R.drawable.brannan_process);
+        addInputTexture(R.drawable.brannan_blowout);
+        addInputTexture(R.drawable.brannan_contrast);
+        addInputTexture(R.drawable.brannan_luma);
+        addInputTexture(R.drawable.brannan_screen);
     }
 }

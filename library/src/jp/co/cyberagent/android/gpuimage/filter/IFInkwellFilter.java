@@ -29,6 +29,6 @@ public class IFInkwellFilter extends IFImageFilter {
     }
 
     private void setRes() {
-        addInputTexture(R.drawable.texture_inkwell_map);
+        addInputTexture(R.drawable.inkwell_map);
     }
 }

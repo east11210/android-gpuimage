@@ -44,7 +44,7 @@ public class IFWaldenFilter extends IFImageFilter {
     }
 
     private void setRes() {
-        addInputTexture(R.drawable.texture_walden_map);
-        addInputTexture(R.drawable.texture_vignette_map);
+        addInputTexture(R.drawable.walden_map);
+        addInputTexture(R.drawable.vignette_map);
     }
 }

@@ -31,6 +31,6 @@ public class IFNashvilleFilter extends IFImageFilter {
     }
 
     private void setRes() {
-        addInputTexture(R.drawable.texture_nashville_map);
+        addInputTexture(R.drawable.nashville_map);
     }
 }

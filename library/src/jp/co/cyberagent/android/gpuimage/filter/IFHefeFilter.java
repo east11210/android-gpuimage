@@ -54,10 +54,10 @@ public class IFHefeFilter extends IFImageFilter {
     }
 
     private void setRes() {
-        addInputTexture(R.drawable.texture_edge_burn);
-        addInputTexture(R.drawable.texture_hefe_map);
-        addInputTexture(R.drawable.texture_hefe_gradient_map);
-        addInputTexture(R.drawable.texture_hefe_soft_light);
-        addInputTexture(R.drawable.texture_hefe_metal);
+        addInputTexture(R.drawable.edge_burn);
+        addInputTexture(R.drawable.hefe_map);
+        addInputTexture(R.drawable.hefe_gradient_map);
+        addInputTexture(R.drawable.hefe_soft_light);
+        addInputTexture(R.drawable.hefe_metal);
     }
 }

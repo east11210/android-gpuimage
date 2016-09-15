@@ -42,8 +42,8 @@ public class IFHudsonFilter extends IFImageFilter {
     }
 
     private void setRes() {
-        addInputTexture(R.drawable.texture_hudson_background);
-        addInputTexture(R.drawable.texture_overlay_map);
-        addInputTexture(R.drawable.texture_hudson_map);
+        addInputTexture(R.drawable.hudson_background);
+        addInputTexture(R.drawable.overlay_map);
+        addInputTexture(R.drawable.hudson_map);
     }
 }

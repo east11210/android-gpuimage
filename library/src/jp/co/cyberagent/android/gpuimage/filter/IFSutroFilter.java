@@ -58,10 +58,10 @@ public class IFSutroFilter extends IFImageFilter {
     }
 
     private void setRes() {
-        addInputTexture(R.drawable.texture_vignette_map);
-        addInputTexture(R.drawable.texture_sutro_metal);
-        addInputTexture(R.drawable.texture_soft_light);
-        addInputTexture(R.drawable.texture_sutro_edge_burn);
-        addInputTexture(R.drawable.texture_sutro_curves);
+        addInputTexture(R.drawable.vignette_map);
+        addInputTexture(R.drawable.sutro_metal);
+        addInputTexture(R.drawable.soft_light);
+        addInputTexture(R.drawable.sutro_edge_burn);
+        addInputTexture(R.drawable.sutro_curves);
     }
 }

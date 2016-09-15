@@ -81,10 +81,10 @@ public class IFToasterFilter extends IFImageFilter {
     }
 
     private void setRes() {
-        addInputTexture(R.drawable.texture_toaster_metal);
-        addInputTexture(R.drawable.texture_toaster_soft_light);
-        addInputTexture(R.drawable.texture_toaster_curves);
-        addInputTexture(R.drawable.texture_toaster_overlay_map_warm);
-        addInputTexture(R.drawable.texture_toaster_color_shift);
+        addInputTexture(R.drawable.toaster_metal);
+        addInputTexture(R.drawable.toaster_soft_light);
+        addInputTexture(R.drawable.toaster_curves);
+        addInputTexture(R.drawable.toaster_overlay_map_warm);
+        addInputTexture(R.drawable.toaster_color_shift);
     }
 }

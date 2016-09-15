@@ -42,12 +42,12 @@ import java.util.Date;
 import jp.co.cyberagent.android.gpuimage.GPUImage;
 import jp.co.cyberagent.android.gpuimage.GPUImage.OnPictureSavedListener;
 import jp.co.cyberagent.android.gpuimage.GPUImageFilter;
-import jp.co.cyberagent.android.gpuimage.sample.GPUImageFilterTools;
-import jp.co.cyberagent.android.gpuimage.sample.GPUImageFilterTools.FilterAdjuster;
-import jp.co.cyberagent.android.gpuimage.sample.GPUImageFilterTools.OnGpuImageFilterChosenListener;
+import jp.co.cyberagent.android.gpuimage.GPUImageFilterTools;
+import jp.co.cyberagent.android.gpuimage.GPUImageFilterTools.FilterAdjuster;
 import jp.co.cyberagent.android.gpuimage.sample.R;
 import jp.co.cyberagent.android.gpuimage.sample.utils.CameraHelper;
 import jp.co.cyberagent.android.gpuimage.sample.utils.CameraHelper.CameraInfo2;
+import jp.co.cyberagent.android.gpuimage.sample.utils.GPUImageFilterChooser;
 
 public class ActivityCamera extends Activity implements OnSeekBarChangeListener, OnClickListener {
 
@@ -94,13 +94,15 @@ public class ActivityCamera extends Activity implements OnSeekBarChangeListener,
     public void onClick(final View v) {
         switch (v.getId()) {
             case R.id.button_choose_filter:
-                GPUImageFilterTools.showDialog(this, new OnGpuImageFilterChosenListener() {
-
-                    @Override
-                    public void onGpuImageFilterChosenListener(final GPUImageFilter filter) {
-                        switchFilterTo(filter);
-                    }
-                });
+                GPUImageFilterChooser.showDialog(this,
+                        new GPUImageFilterChooser.OnGpuImageFilterChosenListener() {
+                            @Override
+                            public void onGpuImageFilterChosenListener(
+                                    final GPUImageFilter filter,
+                                    final GPUImageFilterTools.FilterAdjuster adjuster) {
+                                switchFilterTo(filter, adjuster);
+                            }
+                        });
                 break;
 
             case R.id.button_capture:
@@ -212,12 +214,13 @@ public class ActivityCamera extends Activity implements OnSeekBarChangeListener,
         return mediaFile;
     }
 
-    private void switchFilterTo(final GPUImageFilter filter) {
+    private void switchFilterTo(final GPUImageFilter filter,
+                                final FilterAdjuster adjuster) {
         if (mFilter == null
                 || (filter != null && !mFilter.getClass().equals(filter.getClass()))) {
             mFilter = filter;
             mGPUImage.setFilter(mFilter);
-            mFilterAdjuster = new FilterAdjuster(mFilter);
+            mFilterAdjuster = adjuster;
         }
     }
 

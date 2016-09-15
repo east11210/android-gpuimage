@@ -33,8 +33,8 @@ public class IFRiseFilter extends IFImageFilter {
     }
 
     private void setRes() {
-        addInputTexture(R.drawable.texture_blackboard);
-        addInputTexture(R.drawable.texture_overlay_map);
-        addInputTexture(R.drawable.texture_rise_map);
+        addInputTexture(R.drawable.blackboard);
+        addInputTexture(R.drawable.overlay_map);
+        addInputTexture(R.drawable.rise_map);
     }
 }

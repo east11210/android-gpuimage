@@ -16,15 +16,20 @@
 
 package jp.co.cyberagent.android.gpuimage.sample.activity;
 
+import jp.co.cyberagent.android.gpuimage.GPUImage;
 import jp.co.cyberagent.android.gpuimage.GPUImageFilter;
+import jp.co.cyberagent.android.gpuimage.GPUImageFilterTools;
 import jp.co.cyberagent.android.gpuimage.GPUImageView;
 import jp.co.cyberagent.android.gpuimage.GPUImageView.OnPictureSavedListener;
-import jp.co.cyberagent.android.gpuimage.sample.GPUImageFilterTools;
-import jp.co.cyberagent.android.gpuimage.sample.GPUImageFilterTools.FilterAdjuster;
-import jp.co.cyberagent.android.gpuimage.sample.GPUImageFilterTools.OnGpuImageFilterChosenListener;
+import jp.co.cyberagent.android.gpuimage.GPUImageZoomBlurFilter;
+import jp.co.cyberagent.android.gpuimage.GPUImageFilterTools.FilterAdjuster;
 import jp.co.cyberagent.android.gpuimage.sample.R;
+import jp.co.cyberagent.android.gpuimage.sample.utils.GPUImageFilterChooser;
+
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -32,6 +37,9 @@ import android.view.View.OnClickListener;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 public class ActivityGallery extends Activity implements OnSeekBarChangeListener,
         OnClickListener, OnPictureSavedListener {
@@ -77,14 +85,15 @@ public class ActivityGallery extends Activity implements OnSeekBarChangeListener
     public void onClick(final View v) {
         switch (v.getId()) {
             case R.id.button_choose_filter:
-                GPUImageFilterTools.showDialog(this, new OnGpuImageFilterChosenListener() {
-
-                    @Override
-                    public void onGpuImageFilterChosenListener(final GPUImageFilter filter) {
-                        switchFilterTo(filter);
-                        mGPUImageView.requestRender();
-                    }
-
+                GPUImageFilterChooser.showDialog(this,
+                        new GPUImageFilterChooser.OnGpuImageFilterChosenListener() {
+                            @Override
+                            public void onGpuImageFilterChosenListener(
+                                    final GPUImageFilter filter,
+                                    final GPUImageFilterTools.FilterAdjuster adjuster) {
+                                switchFilterTo(filter, adjuster);
+                                mGPUImageView.requestRender();
+                            }
                 });
                 break;
             case R.id.button_save:
@@ -108,15 +117,14 @@ public class ActivityGallery extends Activity implements OnSeekBarChangeListener
 //        mGPUImageView.saveToPictures("GPUImage", fileName, 1600, 1600, this);
     }
 
-    private void switchFilterTo(final GPUImageFilter filter) {
+    private void switchFilterTo(final GPUImageFilter filter, final FilterAdjuster adjuster) {
         if (mFilter == null
                 || (filter != null && !mFilter.getClass().equals(filter.getClass()))) {
             mFilter = filter;
             mGPUImageView.setFilter(mFilter);
-            mFilterAdjuster = new FilterAdjuster(mFilter);
-
+            mFilterAdjuster = adjuster;
             findViewById(R.id.seekBar).setVisibility(
-                    mFilterAdjuster.canAdjust() ? View.VISIBLE : View.GONE);
+                    mFilterAdjuster == null ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -138,5 +146,19 @@ public class ActivityGallery extends Activity implements OnSeekBarChangeListener
 
     private void handleImage(final Uri selectedImage) {
         mGPUImageView.setImage(selectedImage);
+
+        GPUImage gpuImage = new GPUImage(this);
+        gpuImage.setFilter(new GPUImageZoomBlurFilter());
+        try {
+            InputStream inputStream = this.getContentResolver().openInputStream(selectedImage);
+            Bitmap input = BitmapFactory.decodeStream(inputStream);
+            gpuImage.setImage(input);
+        } catch (FileNotFoundException e) {
+
+        }
+        Bitmap out = gpuImage.getBitmapWithFilterApplied();
+
+        int a = 0;
+
     }
 }
