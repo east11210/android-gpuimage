@@ -119,7 +119,7 @@ public class GPUImageView extends FrameLayout {
      *
      * @param scaleType the new ScaleType
      */
-    public void setScaleType(GPUImage.ScaleType scaleType) {
+    public void setScaleType(GPUImageScaleType scaleType) {
         mGPUImage.setScaleType(scaleType);
     }
 

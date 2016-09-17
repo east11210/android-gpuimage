@@ -118,15 +118,39 @@ public class PixelBuffer {
 
         // Call the renderer draw routine (it seems that some filters do not
         // work if this is only called once)
+//        mRenderer.onDrawFrame(mGL);
         mRenderer.onDrawFrame(mGL);
-        mRenderer.onDrawFrame(mGL);
+        // TODO: Verify solution: use flush to replace draw twice
+        mGL.glFlush();
         convertToBitmap();
         return mBitmap;
     }
 
+    public void getBitmap(Bitmap bitmap) {
+        // Do we have a renderer?
+        if (mRenderer == null) {
+            Log.e(TAG, "getBitmap: Renderer was not set.");
+            return;
+        }
+
+        // Does this thread own the OpenGL context?
+        if (!Thread.currentThread().getName().equals(mThreadOwner)) {
+            Log.e(TAG, "getBitmap: This thread does not own the OpenGL context.");
+            return;
+        }
+
+        // Call the renderer draw routine (it seems that some filters do not
+        // work if this is only called once)
+//        mRenderer.onDrawFrame(mGL);
+        mRenderer.onDrawFrame(mGL);
+        // TODO: Verify solution: use flush to replace draw twice
+        mGL.glFlush();
+        GPUImageNativeLibrary.CopyToBitmap(bitmap);
+    }
+
     public void destroy() {
-        mRenderer.onDrawFrame(mGL);
-        mRenderer.onDrawFrame(mGL);
+//        mRenderer.onDrawFrame(mGL);
+//        mRenderer.onDrawFrame(mGL);
         mEGL.eglMakeCurrent(mEGLDisplay, EGL10.EGL_NO_SURFACE,
                 EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
 
@@ -189,22 +213,23 @@ public class PixelBuffer {
     }
 
     private void convertToBitmap() {
-        int[] iat = new int[mWidth * mHeight];
-        IntBuffer ib = IntBuffer.allocate(mWidth * mHeight);
-        mGL.glReadPixels(0, 0, mWidth, mHeight, GL_RGBA, GL_UNSIGNED_BYTE, ib);
-        int[] ia = ib.array();
-
-        //Stupid !
-        // Convert upside down mirror-reversed image to right-side up normal
-        // image.
-        for (int i = 0; i < mHeight; i++) {
-            for (int j = 0; j < mWidth; j++) {
-                iat[(mHeight - i - 1) * mWidth + j] = ia[i * mWidth + j];
-            }
-        }
-        
-
+//        int[] iat = new int[mWidth * mHeight];
+//        IntBuffer ib = IntBuffer.allocate(mWidth * mHeight);
+//        mGL.glReadPixels(0, 0, mWidth, mHeight, GL_RGBA, GL_UNSIGNED_BYTE, ib);
+//        int[] ia = ib.array();
+//
+//        //Stupid !
+//        // Convert upside down mirror-reversed image to right-side up normal
+//        // image.
+//        for (int i = 0; i < mHeight; i++) {
+//            for (int j = 0; j < mWidth; j++) {
+//                iat[(mHeight - i - 1) * mWidth + j] = ia[i * mWidth + j];
+//            }
+//        }
+//
+//        mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+//        mBitmap.copyPixelsFromBuffer(IntBuffer.wrap(iat));
         mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
-        mBitmap.copyPixelsFromBuffer(IntBuffer.wrap(iat));
+        GPUImageNativeLibrary.CopyToBitmap(mBitmap);
     }
 }

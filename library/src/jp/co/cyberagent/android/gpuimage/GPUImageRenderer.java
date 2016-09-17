@@ -71,7 +71,7 @@ public class GPUImageRenderer implements Renderer, PreviewCallback {
     private Rotation mRotation;
     private boolean mFlipHorizontal;
     private boolean mFlipVertical;
-    private GPUImage.ScaleType mScaleType = GPUImage.ScaleType.CENTER_CROP;
+    private GPUImageScaleType mScaleType = GPUImageScaleType.CENTER_CROP;
 
     private float mBackgroundRed = 0;
     private float mBackgroundGreen = 0;
@@ -255,7 +255,7 @@ public class GPUImageRenderer implements Renderer, PreviewCallback {
         });
     }
 
-    public void setScaleType(GPUImage.ScaleType scaleType) {
+    public void setScaleType(GPUImageScaleType scaleType) {
         mScaleType = scaleType;
     }
 
@@ -286,7 +286,7 @@ public class GPUImageRenderer implements Renderer, PreviewCallback {
 
         float[] cube = CUBE;
         float[] textureCords = TextureRotationUtil.getRotation(mRotation, mFlipHorizontal, mFlipVertical);
-        if (mScaleType == GPUImage.ScaleType.CENTER_CROP) {
+        if (mScaleType == GPUImageScaleType.CENTER_CROP) {
             float distHorizontal = (1 - 1 / ratioWidth) / 2;
             float distVertical = (1 - 1 / ratioHeight) / 2;
             textureCords = new float[]{

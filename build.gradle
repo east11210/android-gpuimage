@@ -17,5 +17,8 @@ allprojects {
     }
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
+        options.fork = true
+        options.forkOptions.jvmArgs += ["-Duser.language=en"]
+        options.compilerArgs += '-Xlint:unchecked'
     }
 }

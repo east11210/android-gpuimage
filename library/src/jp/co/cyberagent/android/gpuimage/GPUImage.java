@@ -54,7 +54,7 @@ public class GPUImage {
     private GLSurfaceView mGlSurfaceView;
     private GPUImageFilter mFilter;
     private Bitmap mCurrentBitmap;
-    private ScaleType mScaleType = ScaleType.CENTER_CROP;
+    private GPUImageScaleType mScaleType = GPUImageScaleType.CENTER_CROP;
 
     /**
      * Instantiates a new GPUImage object.
@@ -195,7 +195,7 @@ public class GPUImage {
      *
      * @param scaleType The new ScaleType
      */
-    public void setScaleType(ScaleType scaleType) {
+    public void setScaleType(GPUImageScaleType scaleType) {
         mScaleType = scaleType;
         mRenderer.setScaleType(scaleType);
         mRenderer.deleteImage();
@@ -637,7 +637,7 @@ public class GPUImage {
                 System.gc();
             }
 
-            if (mScaleType == ScaleType.CENTER_CROP) {
+            if (mScaleType == GPUImageScaleType.CENTER_CROP) {
                 // Crop it
                 int diffWidth = newSize[0] - mOutputWidth;
                 int diffHeight = newSize[1] - mOutputHeight;
@@ -665,7 +665,7 @@ public class GPUImage {
             float withRatio = (float) width / mOutputWidth;
             float heightRatio = (float) height / mOutputHeight;
 
-            boolean adjustWidth = mScaleType == ScaleType.CENTER_CROP
+            boolean adjustWidth = mScaleType == GPUImageScaleType.CENTER_CROP
                     ? withRatio > heightRatio : withRatio < heightRatio;
 
             if (adjustWidth) {
@@ -679,7 +679,7 @@ public class GPUImage {
         }
 
         private boolean checkSize(boolean widthBigger, boolean heightBigger) {
-            if (mScaleType == ScaleType.CENTER_CROP) {
+            if (mScaleType == GPUImageScaleType.CENTER_CROP) {
                 return widthBigger && heightBigger;
             } else {
                 return widthBigger || heightBigger;
@@ -712,6 +712,4 @@ public class GPUImage {
     public interface ResponseListener<T> {
         void response(T item);
     }
-
-    public enum ScaleType { CENTER_INSIDE, CENTER_CROP }
 }
