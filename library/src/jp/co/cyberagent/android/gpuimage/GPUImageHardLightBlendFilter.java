@@ -16,47 +16,82 @@
 
 package jp.co.cyberagent.android.gpuimage;
 
+import android.opengl.GLES20;
+
 public class GPUImageHardLightBlendFilter extends GPUImageTwoInputFilter {
     public static final String HARD_LIGHT_BLEND_FRAGMENT_SHADER = "varying highp vec2 textureCoordinate;\n" +
-            " varying highp vec2 textureCoordinate2;\n" +
+            "varying highp vec2 textureCoordinate2;\n" +
             "\n" +
-            " uniform sampler2D inputImageTexture;\n" +
-            " uniform sampler2D inputImageTexture2;\n" +
+            "uniform sampler2D inputImageTexture;\n" +
+            "uniform sampler2D inputImageTexture2;\n" +
+            "uniform int swapTexture;\n" +
             "\n" +
-            " const highp vec3 W = vec3(0.2125, 0.7154, 0.0721);\n" +
+            "const highp vec3 W = vec3(0.2125, 0.7154, 0.0721);\n" +
             "\n" +
-            " void main()\n" +
-            " {\n" +
-            "     mediump vec4 base = texture2D(inputImageTexture, textureCoordinate);\n" +
-            "     mediump vec4 overlay = texture2D(inputImageTexture2, textureCoordinate2);\n" +
+            "void main()\n" +
+            "{\n" +
+            "    mediump vec4 base, overlay;\n" +
+            "    if (0 == swapTexture) {\n" +
+            "        base = texture2D(inputImageTexture, textureCoordinate);\n" +
+            "        overlay = texture2D(inputImageTexture2, textureCoordinate2);\n" +
+            "    } else {\n" +
+            "        overlay = texture2D(inputImageTexture, textureCoordinate);\n" +
+            "        base = texture2D(inputImageTexture2, textureCoordinate2);\n" +
+            "    }\n" +
             "\n" +
-            "     highp float ra;\n" +
-            "     if (2.0 * overlay.r < overlay.a) {\n" +
-            "         ra = 2.0 * overlay.r * base.r + overlay.r * (1.0 - base.a) + base.r * (1.0 - overlay.a);\n" +
-            "     } else {\n" +
-            "         ra = overlay.a * base.a - 2.0 * (base.a - base.r) * (overlay.a - overlay.r) + overlay.r * (1.0 - base.a) + base.r * (1.0 - overlay.a);\n" +
-            "     }\n" +
-            "     \n" +
-            "     highp float ga;\n" +
-            "     if (2.0 * overlay.g < overlay.a) {\n" +
-            "         ga = 2.0 * overlay.g * base.g + overlay.g * (1.0 - base.a) + base.g * (1.0 - overlay.a);\n" +
-            "     } else {\n" +
-            "         ga = overlay.a * base.a - 2.0 * (base.a - base.g) * (overlay.a - overlay.g) + overlay.g * (1.0 - base.a) + base.g * (1.0 - overlay.a);\n" +
-            "     }\n" +
-            "     \n" +
-            "     highp float ba;\n" +
-            "     if (2.0 * overlay.b < overlay.a) {\n" +
-            "         ba = 2.0 * overlay.b * base.b + overlay.b * (1.0 - base.a) + base.b * (1.0 - overlay.a);\n" +
-            "     } else {\n" +
-            "         ba = overlay.a * base.a - 2.0 * (base.a - base.b) * (overlay.a - overlay.b) + overlay.b * (1.0 - base.a) + base.b * (1.0 - overlay.a);\n" +
-            "     }\n" +
-            "     \n" +
-            "     gl_FragColor = vec4(ra, ga, ba, 1.0);\n" +
-            " }";
+            "    highp float ra;\n" +
+            "    if (2.0 * overlay.r < overlay.a) {\n" +
+            "        ra = 2.0 * overlay.r * base.r + overlay.r * (1.0 - base.a) + base.r * (1.0 - overlay.a);\n" +
+            "    } else {\n" +
+            "        ra = overlay.a * base.a - 2.0 * (base.a - base.r) * (overlay.a - overlay.r) + overlay.r * (1.0 - base.a) + base.r * (1.0 - overlay.a);\n" +
+            "    }\n" +
+            "    \n" +
+            "    highp float ga;\n" +
+            "    if (2.0 * overlay.g < overlay.a) {\n" +
+            "        ga = 2.0 * overlay.g * base.g + overlay.g * (1.0 - base.a) + base.g * (1.0 - overlay.a);\n" +
+            "    } else {\n" +
+            "        ga = overlay.a * base.a - 2.0 * (base.a - base.g) * (overlay.a - overlay.g) + overlay.g * (1.0 - base.a) + base.g * (1.0 - overlay.a);\n" +
+            "    }\n" +
+            "    \n" +
+            "    highp float ba;\n" +
+            "    if (2.0 * overlay.b < overlay.a) {\n" +
+            "        ba = 2.0 * overlay.b * base.b + overlay.b * (1.0 - base.a) + base.b * (1.0 - overlay.a);\n" +
+            "    } else {\n" +
+            "        ba = overlay.a * base.a - 2.0 * (base.a - base.b) * (overlay.a - overlay.b) + overlay.b * (1.0 - base.a) + base.b * (1.0 - overlay.a);\n" +
+            "    }\n" +
+            "    \n" +
+            "    gl_FragColor = vec4(ra, ga, ba, 1.0);\n" +
+            "}";
+
+    private int mSwapTexture;
+    private int mSwapTextureLocation;
 
     public GPUImageHardLightBlendFilter() {
+        this(1);
+    }
+
+    public GPUImageHardLightBlendFilter(final int swapTexture) {
         super(HARD_LIGHT_BLEND_FRAGMENT_SHADER);
+        mSwapTexture = swapTexture;
+    }
+
+    @Override
+    public void onInit() {
+        super.onInit();
+        mSwapTextureLocation = GLES20.glGetUniformLocation(getProgram(), "swapTexture");
+    }
+
+    @Override
+    public void onInitialized() {
+        super.onInitialized();
+        setSwapTexture(mSwapTexture);
+    }
+
+    public void setSwapTexture(final int swapTexture) {
+        if (0 != swapTexture && 1 != swapTexture) {
+            return;
+        }
+        mSwapTexture = swapTexture;
+        setInteger(mSwapTextureLocation, mSwapTexture);
     }
 }
-
-// TODO: Add parameter to swap texture1 and texture2
